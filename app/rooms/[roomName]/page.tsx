@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { auth } from '@/auth';
 import { PageClientImpl } from './PageClientImpl';
 import { isVideoCodec } from '@/lib/types';
 
@@ -14,6 +15,7 @@ export default async function Page({
     codec?: string;
   }>;
 }) {
+  const session = await auth();
   const _params = await params;
   const _searchParams = await searchParams;
   const codec =
@@ -28,6 +30,7 @@ export default async function Page({
       region={_searchParams.region}
       hq={hq}
       codec={codec}
+      userName={session?.user?.name ?? ''}
     />
   );
 }
