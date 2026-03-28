@@ -10,13 +10,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    authorized({ auth, request }) {
-      const { pathname } = request.nextUrl;
-      // Only require auth for rooms and connection-details API
-      if (pathname.startsWith('/rooms') || pathname.startsWith('/api/connection-details')) {
-        return !!auth;
-      }
-      return true;
+    authorized({ auth }) {
+      return !!auth;
     },
   },
 });
