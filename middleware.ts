@@ -11,7 +11,7 @@ const { auth } = NextAuth({
   ],
   callbacks: {
     authorized({ auth }) {
-      return !!auth;
+      return !!auth?.user;
     },
   },
 });
