@@ -1,23 +1,21 @@
-import NextAuth from 'next-auth';
-import MicrosoftEntraID from 'next-auth/providers/microsoft-entra-id';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-const { auth } = NextAuth({
-  providers: [
-    MicrosoftEntraID({
-      clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
-      clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
-      issuer: `https://login.microsoftonline.com/${process.env.AUTH_MICROSOFT_ENTRA_ID_TENANT_ID}/v2.0`,
-    }),
-  ],
-  callbacks: {
-    authorized({ auth }) {
-      return !!auth?.user;
-    },
-  },
-});
+export async function middleware(request: NextRequest) {
+  // Check for the session token cookie
+  const token =
+    request.cookies.get('authjs.session-token')?.value ||
+    request.cookies.get('__Secure-authjs.session-token')?.value;
 
-export default auth;
+  if (!token) {
+    const signInUrl = new URL('/api/auth/signin', request.url);
+    signInUrl.searchParams.set('callbackUrl', request.url);
+    return NextResponse.redirect(signInUrl);
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ['/rooms/:path*', '/api/connection-details'],
+  matcher: ['/rooms/:path*'],
 };
